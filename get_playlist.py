@@ -17,8 +17,8 @@ from tqdm import tqdm
 from tqdm import trange
 import time
 
-cid = 'f0c08080505c44a9ad61fd3b1dc36242'
-secret = '6075359d9ce54847bdcdeff919c22667'
+cid = ''
+secret = ''
 
 #Authentication#
 client_credentials_mgmt = SpotifyClientCredentials(client_id=cid, client_secret=secret)
