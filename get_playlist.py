@@ -112,25 +112,38 @@ def check_update(old_track_list):
             print("There is update on playlist")
             add_track_list = list(set(new_track_list)-set(old_track_list))
             delete_track_list = list(set(old_track_list)-set(new_track_list))
-            update_process(add_track_list, delete_track_list)
-        time.sleep(5)
+            add_process(add_track_list)
+            delete_process(delete_track_list)
+        time.sleep(10)
 
-def update_process(add_track_list, delete_track_list):
+def add_process(add_track_list):
     # Add new song
     search_result_list = find_youtube(add_track_list)
     download_yt(search_result_list)
 
-    # Delete unliked song
-    if len(delete_track_list)==0:
-        print("There is nothing to delete")
-
-    else:
-        print("We need to delete")
-        print(delete_track_list)
-        
     
     track_list = get_playlist('https://open.spotify.com/playlist/2aOVUWcMjSSF6SzjWDxnIO')
     check_update(track_list)
-
+     
+def delete_process(delete_track_list):
+    #delete unliked song
+    for i in trange(len(delete_track_list), desc='Finding name to delete'):
+        track_to_delete = find_youtube(delete_track_list)
+        link = f"https://www.youtube.com/watch?v={track_to_delete[i][0]}"
+        try:
+            yt = YouTube(link, on_progress_callback = on_progress)
+            yt.title = re.sub(r'[\\/:*?"<>|]', "", yt.title)  # Sanitize file name
+            
+            output_dir = "output"
+            ys = yt.streams.filter(only_audio=True).first()
+            downloaded_file = ys.download(output_path=output_dir)
+            audio_file = os.path.splitext(downloaded_file)[0] + ".mp3"
+            os.remove(downloaded_file)
+            print('!!!!!!!!!', audio_file, '!!!!!!!!!')
+            
+        except Exception as e:
+            raise ValueError(f"Failed to download YouTube video: {e}")
+            return 1
+        
 if __name__ == "__main__":
     download_process() 
